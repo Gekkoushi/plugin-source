@@ -1,4 +1,5 @@
-﻿import tasks.ReportGenerateTask
+import tasks.ReportGenerateTask
+import tasks.DexPluginTask
 
 plugins {
     `java-library`
@@ -20,8 +21,7 @@ ksp {
 }
 
 tasks.jar {
-    // remember to dex it with d8 before sideloading
-	archiveFileName.set("gekkoushi.jar")
+	archiveFileName.set("raw.jar")
 	exclude("android/**")
 	exclude("androidx/annotation/**")
 	exclude("androidx/preference/**")
@@ -72,6 +72,19 @@ dependencies {
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.quickjs)
+}
+
+tasks.register("buildJar") {
+    description = "Build all sources to a JAR file"
+    dependsOn("dexJar")
+}
+
+tasks.register<DexPluginTask>("dexJar") {
+    description = "Dex classes after build"
+    dependsOn(tasks.jar)
+    inputJar.set(tasks.jar.flatMap { it.archiveFile })
+    outputJar.set(layout.projectDirectory.file("build/libs/gekkoushi.jar"))
+    classpath.from(configurations.runtimeClasspath)
 }
 
 tasks.register<ReportGenerateTask>("generateTestsReport") {

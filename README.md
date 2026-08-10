@@ -3,7 +3,7 @@
 This project provides a collection of utilities and some parsers for convenient access to any content available on the web. It can be used in
 JVM and Android applications.
 
-![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FYakaTeam%2Fkotatsu-parsers%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/YakaTeam/kotatsu-parsers.svg)](https://jitpack.io/#YakaTeam/kotatsu-parsers) [![Build](https://github.com/YakaTeam/kotatsu-parsers/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/YakaTeam/kotatsu-parsers/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/YakaTeam/kotatsu-parsers)
+![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FGekkoushi%2Fplugin-source%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/Gekkoushi/plugin-source.svg)](https://jitpack.io/#Gekkoushi/plugin-source) [![Build](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/Gekkoushi/plugin-source)
 
 ## Requirements
 

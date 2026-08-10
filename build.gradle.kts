@@ -21,7 +21,7 @@ ksp {
 
 tasks.jar {
     // remember to dex it with d8 before sideloading
-	archiveFileName.set("plugin.jar")
+	archiveFileName.set("gekkoushi.jar")
 	exclude("android/**")
 	exclude("androidx/annotation/**")
 	exclude("androidx/preference/**")

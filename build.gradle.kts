@@ -1,14 +1,16 @@
 import tasks.ReportGenerateTask
+import tasks.DexPluginTask
 
 plugins {
     `java-library`
     `maven-publish`
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
-group = "org.koitharu"
-version = "1.2.5"
+group = "org.gekkoushi"
+version = "1.2.6"
 
 tasks.test {
     useJUnitPlatform()
@@ -19,7 +21,10 @@ ksp {
 }
 
 tasks.jar {
-	archiveFileName.set("kotatsu-parsers.jar")
+	archiveFileName.set("raw.jar")
+	exclude("android/**")
+	exclude("androidx/annotation/**")
+	exclude("androidx/preference/**")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -29,14 +34,14 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlin.contracts.ExperimentalContracts",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-opt-in=org.koitharu.kotatsu.parsers.InternalParsersApi",
+            "-opt-in=tsuki.InternalParsersApi",
         )
     }
 }
 
 kotlin {
     jvmToolchain(11)
-    explicitApiWarning()
+	explicitApiWarning()
     sourceSets["main"].kotlin.srcDirs("build/generated/ksp/main/kotlin")
 }
 
@@ -50,13 +55,16 @@ publishing {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+	implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.okio)
     implementation(libs.json)
     implementation(libs.androidx.collection)
+
+	api(libs.tsuki)
     api(libs.jsoup)
 
-    ksp(project(":kotatsu-parsers-ksp"))
+    ksp(project(":plugins-ksp"))
 
     testImplementation(libs.junit.api)
     testImplementation(libs.junit.engine)
@@ -66,4 +74,19 @@ dependencies {
     testImplementation(libs.quickjs)
 }
 
-tasks.register<ReportGenerateTask>("generateTestsReport")
+tasks.register("buildJar") {
+    description = "Build all sources to a JAR file"
+    dependsOn("dexJar")
+}
+
+tasks.register<DexPluginTask>("dexJar") {
+    description = "Dex classes after build"
+    dependsOn(tasks.jar)
+    inputJar.set(tasks.jar.flatMap { it.archiveFile })
+    outputJar.set(layout.projectDirectory.file("build/libs/gekkoushi.jar"))
+    classpath.from(configurations.runtimeClasspath)
+}
+
+tasks.register<ReportGenerateTask>("generateTestsReport") {
+    description = "Generate a HTML file to get tests report"
+}

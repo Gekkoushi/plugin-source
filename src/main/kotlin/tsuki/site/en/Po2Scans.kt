@@ -1,0 +1,109 @@
+package tsuki.site.en
+
+import tsuki.Broken
+import tsuki.MangaLoaderContext
+import tsuki.MangaSourceParser
+import tsuki.config.ConfigKey
+import tsuki.core.SinglePageMangaParser
+import tsuki.model.*
+import tsuki.util.*
+import java.text.SimpleDateFormat
+import java.util.*
+
+@Broken("Domain hijacked — now serves a JS redirect to spam/ads")
+@MangaSourceParser("PO2SCANS", "Po2Scans", "en")
+internal class Po2Scans(context: MangaLoaderContext) :
+	SinglePageMangaParser(context, MangaParserSource.PO2SCANS) {
+
+	override val availableSortOrders: Set<SortOrder> = EnumSet.of(SortOrder.ALPHABETICAL)
+	override val configKeyDomain = ConfigKey.Domain("po2scans.com")
+
+	override val filterCapabilities: MangaListFilterCapabilities
+		get() = MangaListFilterCapabilities(
+			isSearchSupported = true,
+		)
+
+	override suspend fun getFilterOptions() = MangaListFilterOptions()
+
+	override fun onCreateConfig(keys: MutableCollection<ConfigKey<*>>) {
+		super.onCreateConfig(keys)
+		keys.add(userAgentKey)
+	}
+
+	override suspend fun getList(order: SortOrder, filter: MangaListFilter): List<Manga> {
+		val url = buildString {
+			append("https://")
+			append(domain)
+			append("/series")
+			if (!filter.query.isNullOrEmpty()) {
+				append("?search=")
+				append(filter.query.urlEncoded())
+			}
+		}
+		val doc = webClient.httpGet(url).parseHtml()
+		return doc.select(".series-list").map { div ->
+			val href = "/" + div.selectFirstOrThrow("a").attrAsRelativeUrl("href")
+			Manga(
+				id = generateUid(href),
+				title = div.selectFirstOrThrow("h2").text(),
+				altTitles = emptySet(),
+				url = href,
+				publicUrl = href.toAbsoluteUrl(domain),
+				rating = RATING_UNKNOWN,
+				contentRating = null,
+				coverUrl = div.selectFirstOrThrow("img").src(),
+				tags = emptySet(),
+				state = null,
+				authors = emptySet(),
+				source = source,
+			)
+		}
+	}
+
+	override suspend fun getDetails(manga: Manga): Manga {
+		val doc = webClient.httpGet(manga.url.toAbsoluteUrl(domain)).parseHtml()
+		val dateFormat = SimpleDateFormat("dd MMM, yy", Locale.ENGLISH)
+		val author = doc.selectLast(".author span")?.textOrNull()
+		return manga.copy(
+			state = when (doc.select(".status span").last()?.text()) {
+				"Ongoing" -> MangaState.ONGOING
+				"Done" -> MangaState.FINISHED
+				else -> null
+			},
+			tags = emptySet(),
+			authors = setOfNotNull(author),
+			description = doc.selectFirstOrThrow(".summary").html(),
+			chapters = doc.select(".chap-section .chap")
+				.mapChapters(reversed = true) { i, div ->
+					val a = div.selectFirstOrThrow("a")
+					val url = "/" + a.attrAsRelativeUrl("href").toAbsoluteUrl(domain)
+					MangaChapter(
+						id = generateUid(url),
+						title = a.text(),
+						number = i + 1f,
+						volume = 0,
+						url = url,
+						scanlator = null,
+						uploadDate = dateFormat.parseSafe(div.select(".detail span").last()?.text()),
+						branch = null,
+						source = source,
+					)
+				},
+		)
+	}
+
+	override suspend fun getPages(chapter: MangaChapter): List<MangaPage> {
+		val fullUrl = chapter.url.toAbsoluteUrl(domain)
+		val doc = webClient.httpGet(fullUrl).parseHtml()
+		return doc.select(".swiper-slide img").map { img ->
+			val url = img.src()?.replace("./assets", "/assets")?.toRelativeUrl(domain)
+				?: img.parseFailed("Image src not found")
+			MangaPage(
+				id = generateUid(url),
+				url = url,
+				preview = null,
+				source = source,
+			)
+		}
+	}
+}

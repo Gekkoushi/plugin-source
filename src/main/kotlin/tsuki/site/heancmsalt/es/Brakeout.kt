@@ -1,0 +1,56 @@
+package tsuki.site.heancmsalt.es
+
+import tsuki.MangaLoaderContext
+import tsuki.MangaSourceParser
+import tsuki.model.Manga
+import tsuki.model.MangaChapter
+import tsuki.model.MangaParserSource
+import tsuki.site.heancmsalt.HeanCmsAlt
+import tsuki.util.*
+import java.text.SimpleDateFormat
+import tsuki.Broken
+
+@Broken("Site is online but parser is broken — layout/API changed, needs rewrite")
+@MangaSourceParser("BRAKEOUT", "Brakeout", "es")
+internal class Brakeout(context: MangaLoaderContext) :
+	HeanCmsAlt(context, MangaParserSource.BRAKEOUT, "brakeout.xyz", 10) {
+	override val selectManga = "div.grid.grid-cols-2 figure"
+	override val selectMangaTitle = "figcaption"
+
+	override val selectDesc = "#section-sinopsis p"
+	override val selectChapter = ".grid-capitulos div.contenedor-capitulo-miniatura"
+	override val selectChapterTitle = "#name"
+	override val selectChapterDate = "time"
+	override val datePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"
+	override suspend fun getDetails(manga: Manga): Manga {
+		val fullUrl = manga.url.toAbsoluteUrl(domain)
+		val doc = webClient.httpGet(fullUrl).parseHtml()
+		val dateFormat = SimpleDateFormat(datePattern, sourceLocale)
+		return manga.copy(
+			altTitles = setOfNotNull(doc.selectFirst(selectAlt)?.textOrNull()),
+			description = doc.selectFirstOrThrow(selectDesc).html(),
+			chapters = doc.select(selectChapter)
+				.mapChapters(reversed = true) { i, div ->
+					val a = div.selectFirstOrThrow("a")
+					val dateText = div.selectFirstOrThrow(selectChapterDate).text()
+					val url = a.attrAsRelativeUrl("href").toAbsoluteUrl(domain)
+					MangaChapter(
+						id = generateUid(url),
+						title = div.selectFirstOrThrow(selectChapterTitle).text(),
+						number = i + 1f,
+						volume = 0,
+						url = url,
+						scanlator = null,
+						uploadDate = parseChapterDate(
+							dateFormat,
+							dateText,
+						),
+						branch = null,
+						source = source,
+					)
+				},
+		)
+	}
+
+	override val selectPage = "section img.readImg"
+}

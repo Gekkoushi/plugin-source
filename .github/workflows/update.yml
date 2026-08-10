@@ -3,7 +3,7 @@ name: Update summary (for PRs)
 on:
     pull_request_target:
         paths:
-            - 'src/main/kotlin/org/koitharu/kotatsu/parsers/**'
+            - 'src/main/kotlin/tsuki/**'
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

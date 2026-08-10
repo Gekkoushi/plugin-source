@@ -19,6 +19,33 @@ Before you start, please note that the ability to use the following technologies
 kotatsu-parsers are not a part of the Android application, but you can easily develop and test it directly inside an
 Android application project and relocate it to the library project when done.
 
+## Requirements
+
+- Android Studio or IntelliJ IDEA (Community Edition is enough)
+- Java 11 or later is required
+
+## Building
+
+On Linux & Unix system (with Terminal):
+
+```shell
+chmod +x gradlew && ./gradlew buildJar
+```
+
+On Windows system (with Command Prompt / PowerShell):
+	
+```cmd
+.\gradlew.bat buildJar
+```
+
+More simply, just run `buildJar` task in Android Studio / IntelliJ IDEA.
+
+Versions are available on [JitPack](https://jitpack.io/#Gekkoushi/plugin-source)
+	
+When used in Android
+projects, [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) with
+the [NIO specification](https://developer.android.com/studio/write/java11-nio-support-table) should be enabled to support Java 8+ features.
+
 ### Before you start
 
 First, take a look at the `kotatsu-parsers` project structure. Each parser is a single class that

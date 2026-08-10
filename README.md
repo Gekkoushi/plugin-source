@@ -1,75 +1,17 @@
-# kotatsu-parsers
+# plugin-source
 
-This library provides a collection of manga parsers for convenient access to manga available on the web. It can be used in
-JVM and Android applications. It's a fork of [kotatsu-parsers](https://github.com/KotatsuApp/kotatsu-parsers) from [KotatsuApp](https://github.com/KotatsuApp) organization.
+This project provides a collection of utilities and some parsers for convenient access to some contents available on the web. It can be used in
+JVM and Android applications.
 
-![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FYakaTeam%2Fkotatsu-parsers%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/YakaTeam/kotatsu-parsers.svg)](https://jitpack.io/#YakaTeam/kotatsu-parsers) [![Build](https://github.com/YakaTeam/kotatsu-parsers/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/YakaTeam/kotatsu-parsers/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/YakaTeam/kotatsu-parsers)
+![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FGekkoushi%2Fplugin-source%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/Gekkoushi/plugin-source.svg)](https://jitpack.io/#Gekkoushi/plugin-source) [![Build](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/Gekkoushi/plugin-source)
 
-## Usage
+### Usage
 
-1. Add it to your root build.gradle at the end of repositories:
-
-	```groovy
-	allprojects {
- 		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
-	}
- 	```
-
-2. Add the dependency
-
-	For Java/Kotlin project:
-
-	```groovy
- 	dependencies {
- 		implementation("com.github.YakaTeam:kotatsu-parsers:$parsers_version")
- 	}
- 	```
-
-	For Android project:
-
-	```groovy
- 	dependencies {
- 		implementation("com.github.YakaTeam:kotatsu-parsers:$parsers_version") {
- 			exclude group: 'org.json', module: 'json'
- 		}
- 	}
- 	```
-
-	Versions are available on [JitPack](https://jitpack.io/#YakaTeam/kotatsu-parsers)
-	
-	When used in Android
-	projects, [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring) with
-	the [NIO specification](https://developer.android.com/studio/write/java11-nio-support-table) should be enabled to support Java 8+ features.
-
-4. Usage in code
-
-   ```kotlin
-   val parser = mangaLoaderContext.newParserInstance(MangaParserSource.MANGADEX)
-   ```
-
-   `mangaLoaderContext` is an implementation of the `MangaLoaderContext` class.
-   See examples
-   of [Android](https://github.com/KotatsuApp/Kotatsu/blob/devel/app/src/main/kotlin/org/koitharu/kotatsu/core/parser/MangaLoaderContextImpl.kt)
-   and [Non-Android](https://github.com/YakaTeam/kotatsu-dl/blob/master/src/main/kotlin/org/koitharu/kotatsu/dl/parsers/MangaLoaderContextImpl.kt)
-   implementation.
-
-## Projects that use the library
-
-- [Doki](https://github.com/DokiTeam/Doki) (WIP, Reference)
-- [Kotatsu](https://github.com/KotatsuApp/Kotatsu) (Dead)
-- [Kototoro](https://github.com/skepsun/Kototoro)
-- [kotatsu-dl](https://github.com/YakaTeam/kotatsu-dl) (Forked from [KotatsuApp](https://github.com/KotatsuApp/kotatsu-dl))
-- [Shirizu](https://github.com/ztimms73/shirizu) (Dead)
-- [OtakuWorld](https://github.com/jakepurple13/OtakuWorld) (Switched to using [Tachiyomi Extensions](https://github.com/tachiyomiorg/extensions))
-- [Usagi](https://github.com/UsagiApp/Usagi) (For core only)
-- [Yumemi](https://github.com/YumemiProject/Yumemi) (Archived, Reference)
+You can download plugin artifacts from [this page](https://github.com/Gekkoushi/plugin/releases/). It's always safe and ready to download.**
 
 ## Contribution
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the guidelines. Pull requests are welcome.
 
 ### License
 

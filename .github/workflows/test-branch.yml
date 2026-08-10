@@ -4,6 +4,8 @@ on:
     push:
         branches:
             - master
+        paths:
+        	- 'src/main/kotlin/tsuki/**'
 
 jobs:
     check-and-build:
@@ -21,7 +23,7 @@ jobs:
             -   name: Set up Gradle enviroment 📦
                 uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
                 with:
-                    gradle-version: '9.3.1'
+                    gradle-version: '9.1.0'
 
             -   name: Compile the library 🚀
                 run: ./gradlew compileKotlin

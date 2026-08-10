@@ -7,7 +7,7 @@ JVM and Android applications.
 
 ### Usage
 
-You can download plugin artifacts from [this page](https://github.com/Gekkoushi/plugin/releases/). It's always safe and ready to download.**
+You can download plugin artifacts from [this page](https://github.com/Gekkoushi/plugin/releases/). It's always safe and ready to download.
 
 ## Contribution
 

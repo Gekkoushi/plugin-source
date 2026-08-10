@@ -6,10 +6,7 @@ on:
         branches:
             - master
         paths:
-            - 'src/main/kotlin/org/koitharu/kotatsu/parsers/**'
-
-env:
-    D8_PATH: build/libs/plugin.jar
+            - 'src/main/kotlin/tsuki/**'
 
 jobs:
     publish:
@@ -33,33 +30,21 @@ jobs:
             -   name: Set up Gradle environment 📦
                 uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
                 with:
-                    gradle-version: '9.3.1'
+                    gradle-version: '9.1.0'
 
             -   name: Setup Android SDK 🚀
                 uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
 
-            -   name: Run assemble tasks 🚀
-                run: ./gradlew assemble --rerun-tasks
-
-            -   name: Process library with d8 🚀
-                env:
-                    LIB_PATH: build/libs/kotatsu-parsers.jar
-                run: |
-                    ## Dex classes after build...
-                    if [ -f ${{ env.LIB_PATH }} ]; then
-                        d8 --release ${{ env.LIB_PATH }} --output ${{ env.D8_PATH }}
-                    else
-                        echo "ℹ️ Pre-compiled library not found, skipping D8 step..."
-                    fi
-                continue-on-error: true
+            -   name: Run build task 🚀
+                run: ./gradlew buildJar --rerun-tasks
 
             -   name: Upload artifacts 🌐
                 uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
                 with:
-                    repository: mochi-plugins/repository
+                    repository: Gekkoushi/plugin
                     tag_name: ${{ steps.meta.outputs.sha_short }}
                     name: ${{ steps.meta.outputs.sha_short }}
                     body: |
-                        Built from commit [`${{ steps.meta.outputs.sha_short }}`](https://github.com/YakaTeam/kotatsu-parsers/commit/${{ github.sha }})
-                    files: ${{ env.D8_PATH }}
+                        Built from commit [`${{ steps.meta.outputs.sha_short }}`](https://github.com/Gekkoushi/plugin-source/commit/${{ github.sha }})
+                    files: build/libs/gekkoushi.jar
                     token: ${{ secrets.ARTIFACT_REPO_TOKEN }}

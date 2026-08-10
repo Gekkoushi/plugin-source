@@ -49,7 +49,7 @@ jobs:
             -   name: Set up Gradle environment 📦
                 uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
                 with:
-                    gradle-version: '9.3.1'
+                    gradle-version: '9.1.0'
 
             -   name: Initialize CodeQL 🔍
                 uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2

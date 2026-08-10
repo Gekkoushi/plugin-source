@@ -1,4 +1,5 @@
 [versions]
+collection = "1.6.0"
 kotlin = "2.2.10"
 ksp = "2.2.10-2.0.2"
 coroutines = "1.10.2"
@@ -6,22 +7,26 @@ junit = "5.14.3"
 okhttp = "5.3.2"
 okio = "3.17.0"
 json = "20251224"
-androidx-collection = "1.6.0"
 # Keep Android 5, 6 compatible (with SDK 21 - 23)
 #noinspection NewerVersionAvailable
 jsoup = "1.17.2"
 quickjs = "1.1.0"
 korte = "4.0.10"
+serialization = "1.11.0"
 simplexml = "2.7.1"
+tsuki = "1.0.5"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [libraries]
+tsuki = { module = "com.github.UsagiApp:Tsuki", version.ref = "tsuki"}
 ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 junit-launcher = { group = "org.junit.platform", name = "junit-platform-launcher" }
 junit-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
@@ -29,7 +34,7 @@ junit-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", ver
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 json = { module = "org.json:json", version.ref = "json" }
-androidx-collection = { module = "androidx.collection:collection", version.ref = "androidx-collection" }
+androidx-collection = { module = "androidx.collection:collection", version.ref = "collection" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 quickjs = { module = "io.webfolder:quickjs", version.ref = "quickjs" }
 korte = { module = "com.soywiz.korlibs.korte:korte-jvm", version.ref = "korte" }

@@ -11,8 +11,13 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven {
+			url = uri(
+				"https://jitpack.io"
+			)
+		}
     }
 }
 
-rootProject.name = "kotatsu-parsers"
-include("kotatsu-parsers-ksp")
+rootProject.name = "plugins"
+include("plugins-ksp")

@@ -1,0 +1,214 @@
+package tsuki.site.ja
+
+import tsuki.MangaLoaderContext
+import tsuki.MangaParserAuthProvider
+import tsuki.MangaSourceParser
+import tsuki.config.ConfigKey
+import tsuki.core.AbstractMangaParser
+import tsuki.exception.AuthRequiredException
+import tsuki.model.*
+import tsuki.network.UserAgents
+import tsuki.util.*
+import java.util.*
+
+private const val STATUS_ONGOING = "連載"
+private const val STATUS_FINISHED = "完結"
+
+@MangaSourceParser("NICOVIDEO_SEIGA", "NicoVideo Seiga", "ja")
+internal class NicovideoSeigaParser(context: MangaLoaderContext) :
+	AbstractMangaParser(context, MangaParserSource.NICOVIDEO_SEIGA),
+	MangaParserAuthProvider {
+
+	override val configKeyDomain: ConfigKey.Domain = ConfigKey.Domain("nicovideo.jp")
+
+	override val userAgentKey = ConfigKey.UserAgent(UserAgents.CHROME_DESKTOP)
+
+	override fun onCreateConfig(keys: MutableCollection<ConfigKey<*>>) {
+		super.onCreateConfig(keys)
+		keys.add(userAgentKey)
+	}
+
+	override val availableSortOrders: Set<SortOrder> = EnumSet.of(
+		SortOrder.UPDATED,
+		SortOrder.POPULARITY,
+	)
+
+	override val filterCapabilities: MangaListFilterCapabilities
+		get() = MangaListFilterCapabilities(
+			isSearchSupported = true,
+		)
+
+	override suspend fun getFilterOptions() = MangaListFilterOptions(
+		availableTags = fetchAvailableTags(),
+	)
+
+	override val authUrl: String
+		get() = "https://${getDomain(this, "account")}/login?site=seiga"
+
+	override suspend fun isAuthorized(): Boolean = context.cookieJar.getCookies(getDomain(this, "seiga")).any {
+		it.name == "user_session"
+	}
+
+	override suspend fun getUsername(): String {
+		val body = webClient.httpGet("https://${getDomain(this, "app")}/my/apps").parseHtml().body()
+		return body.selectFirst("#userinfo > div > div > strong")?.text() ?: throw AuthRequiredException(source)
+	}
+
+	override suspend fun getList(offset: Int, order: SortOrder, filter: MangaListFilter): List<Manga> {
+		val page = (offset / 20f).toIntUp().inc()
+		val domain = getDomain(this, "seiga")
+		val query = filter.query
+		val url = when {
+			!query.isNullOrEmpty() -> {
+				return if (offset == 0) getSearchList(query, page) else emptyList()
+			}
+
+			else -> {
+
+				if (filter.tags.isNotEmpty()) {
+					filter.tags.oneOrThrowIfMany().let {
+						"https://$domain/manga/list?category=${it?.key}&page=$page&sort=${getSortKey(order)}"
+					}
+
+				} else {
+					"https://$domain/manga/list?page=$page&sort=${getSortKey(order)}"
+				}
+
+			}
+		}
+
+		val doc = webClient.httpGet(url).parseHtml()
+		val comicList = doc.body().select("#comic_list > ul > li") ?: doc.parseFailed("Container not found")
+		val items = comicList.select("div > .description > div > div")
+		return items.mapNotNull { item ->
+			val href =
+				item.selectFirst(".comic_icon > div > a")?.attrAsRelativeUrlOrNull("href") ?: return@mapNotNull null
+			val statusText = item.selectFirst(".mg_description_header > .mg_icon > .content_status > span")?.text()
+			val author = item.selectFirst(".mg_description_header > .mg_author > a")?.text()
+			Manga(
+				id = generateUid(href),
+				title = item.selectFirst(".mg_body > .title > a")?.text() ?: return@mapNotNull null,
+				coverUrl = item.selectFirst(".comic_icon > div > a > img")?.attrAsAbsoluteUrl("src"),
+				altTitles = emptySet(),
+				authors = setOfNotNull(author),
+				rating = RATING_UNKNOWN,
+				url = href,
+				contentRating = null,
+				tags = item.getElementsByAttributeValueContaining("href", "?category=").mapToSet { a ->
+					MangaTag(
+						key = a.attr("href").substringAfterLast('='),
+						title = a.ownText(),
+						source = source,
+					)
+				},
+				state = when (statusText) {
+					STATUS_ONGOING -> MangaState.ONGOING
+					STATUS_FINISHED -> MangaState.FINISHED
+					else -> null
+				},
+				publicUrl = href.toAbsoluteUrl(item.host ?: getDomain(this, "seiga")),
+				source = source,
+			)
+		}
+	}
+
+	override suspend fun getDetails(manga: Manga): Manga {
+		val doc = webClient.httpGet(manga.url.toAbsoluteUrl(getDomain(this, "seiga"))).parseHtml()
+		val contents = doc.body().requireElementById("contents")
+		val statusText = contents
+			.select("div.mg_work_detail > div > div:nth-child(2) > div.tip.content_status.status_series > span")
+			.text()
+		return manga.copy(
+			description = contents.selectFirst("div.mg_work_detail > div > div.row > div.description_text")?.html(),
+			largeCoverUrl = contents.selectFirst("div.primaries > div.main_visual > a > img")
+				?.attrAsAbsoluteUrlOrNull("src"),
+			state = when (statusText) {
+				STATUS_ONGOING -> MangaState.ONGOING
+				STATUS_FINISHED -> MangaState.FINISHED
+				else -> null
+			},
+			contentRating = if (contents.select(".icon_adult").isNotEmpty()) {
+				ContentRating.ADULT
+			} else {
+				ContentRating.SAFE
+			},
+			chapters = contents.select("#episode_list > ul > li").mapChapters { i, li ->
+				val href = li.selectFirst("div > div.description > div.title > a")
+					?.attrAsRelativeUrl("href") ?: li.parseFailed()
+				MangaChapter(
+					id = generateUid(href),
+					title = li.select("div > div.description > div.title > a").text(),
+					number = i + 1f,
+					volume = 0,
+					url = href,
+					scanlator = null,
+					branch = null,
+					uploadDate = 0,
+					source = source,
+				)
+			},
+		)
+	}
+
+	override suspend fun getPages(chapter: MangaChapter): List<MangaPage> {
+		val fullUrl = chapter.url.toAbsoluteUrl(getDomain(this, "seiga"))
+		val doc = webClient.httpGet(fullUrl).parseHtml()
+		if (!doc.select("#login_manga").isEmpty())
+			throw AuthRequiredException(source)
+		val root = doc.body().select("#page_contents > li")
+		return root.map { li ->
+			val url = li.select("div > img").attr("data-original")
+			MangaPage(
+				id = generateUid(url),
+				url = url,
+				preview = null,
+				source = source,
+			)
+		}
+	}
+
+	private suspend fun fetchAvailableTags(): Set<MangaTag> {
+		val doc = webClient.httpGet("https://${getDomain(this, "seiga")}/manga/list").parseHtml()
+		val root = doc.body().selectOrThrow("#mg_category_list > ul > li").drop(1)
+		return root.mapToSet { li ->
+			val a = li.selectFirstOrThrow("a")
+			MangaTag(
+				title = a.text(),
+				key = a.attrAsRelativeUrl("href").substringAfter("category=").substringBefore("&"),
+				source = source,
+			)
+		}
+	}
+
+	private suspend fun getSearchList(query: String, page: Int): List<Manga> {
+		val domain = getDomain(this, "seiga")
+		val doc = webClient.httpGet("https://$domain/manga/search/?q=$query&page=$page&sort=score").parseHtml()
+		val root = doc.body().select(".search_result__item")
+		return root.mapNotNull { item ->
+			val href = item.selectFirst(".search_result__item__thumbnail > a")
+				?.attrAsRelativeUrl("href") ?: doc.parseFailed()
+			Manga(
+				id = generateUid(href),
+				url = href,
+				publicUrl = href.toAbsoluteUrl(item.host ?: domain),
+				title = item.selectFirst(".search_result__item__info > .search_result__item__info--title > a")
+					?.textOrNull() ?: return@mapNotNull null,
+				altTitles = emptySet(),
+				authors = emptySet(),
+				tags = emptySet(),
+				rating = RATING_UNKNOWN,
+				state = null,
+				contentRating = null,
+				source = source,
+				coverUrl = item.selectFirst(".search_result__item__thumbnail > a > img")
+					?.attrAsAbsoluteUrl("data-original"),
+			)
+		}
+	}
+
+	private fun getSortKey(sortOrder: SortOrder) = when (sortOrder) {
+		SortOrder.POPULARITY -> "manga_view"
+		SortOrder.UPDATED -> "manga_updated"
+		else -> "manga_view"
+	}
+}

@@ -20,12 +20,10 @@ class ParserProcessor(
     private val sourceNamePattern = Regex("[A-Z_][A-Z0-9_]{3,}")
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val kotatsuSymbols = resolver.getSymbolsWithAnnotation("tsuki.MangaSourceParser")
-
-        val kotatsuRet = kotatsuSymbols.filterNot { it.validate() }.toList()
-
-        if (!kotatsuSymbols.iterator().hasNext()) {
-            return kotatsuRet
+		val symbols = resolver.getSymbolsWithAnnotation("tsuki.MangaSourceParser")
+		val ret = symbols.filterNot { it.validate() }.toList()
+		if (!symbols.iterator().hasNext()) {
+			return ret
         }
         val dependencies = Dependencies.ALL_FILES
         val factoryFile =
@@ -52,17 +50,17 @@ class ParserProcessor(
             }
         val totalCount = sourcesFile?.writer().use { sourcesWriter ->
             factoryFile?.writer().use { factoryWriter ->
-                writeContent(sourcesWriter, factoryWriter, kotatsuSymbols)
+                writeContent(sourcesWriter, factoryWriter, symbols)
             }
         }
         writeSummary(totalCount)
-        return kotatsuRet
+        return ret
     }
 
     private fun writeContent(
         sourcesWriter: Writer?,
         factoryWriter: Writer?,
-        kotatsuSymbols: Sequence<KSAnnotated>,
+        symbols: Sequence<KSAnnotated>,
     ): Int {
         if (sourcesWriter == null && factoryWriter == null) {
             return 0
@@ -92,11 +90,10 @@ class ParserProcessor(
 			""".trimIndent(),
         )
 
-        // Process native Kotatsu parsers
-        val kotatsuVisitor = ParserVisitor(sourcesWriter, factoryWriter)
-        val kotatsuCount = kotatsuSymbols
+        val visitor = ParserVisitor(sourcesWriter, factoryWriter)
+        val totalCount = symbols
             .filter { it is KSClassDeclaration && it.validate() }
-            .onEach { it.accept(kotatsuVisitor, Unit) }
+            .onEach { it.accept(visitor, Unit) }
             .count()
 
         factoryWriter?.write(
@@ -115,7 +112,7 @@ class ParserProcessor(
 			}
 			""".trimIndent(),
         )
-        return kotatsuCount
+        return totalCount
     }
 
     private fun writeSummary(totalCount: Int) {
@@ -127,7 +124,7 @@ class ParserProcessor(
         private val sourcesWriter: Writer?,
         private val factoryWriter: Writer?,
     ) : KSVisitorVoid() {
-        val titles = HashMap<String, String>()
+        private val titles = HashMap<String, String>()
 
         override fun visitClassDeclaration(
             classDeclaration: KSClassDeclaration,

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "plugins"
+rootProject.name = "plugin-source"
 include("plugins-ksp")

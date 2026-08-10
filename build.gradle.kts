@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-group = "org.usagi"
-version = "1.0.2"
+group = "org.gekkoushi"
+version = "1.2.6"
 
 tasks.test {
     useJUnitPlatform()
@@ -41,6 +41,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 kotlin {
     jvmToolchain(11)
+	explicitApiWarning()
     sourceSets["main"].kotlin.srcDirs("build/generated/ksp/main/kotlin")
 }
 

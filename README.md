@@ -5,15 +5,18 @@ JVM and Android applications.
 
 > [!IMPORTANT]
 > Only for the Usagi App!
-> For the other forks ignore this.
 >
 > **v0.0.31-beta1** and below use this plugin --> https://github.com/mochi-plugins/repository
 >
-> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/d9db4a9 (Updates yes.)
+> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/ea0f1d0 (Updates yes.)
 >
 > Manual install is required for UMA is required.
 >
 > **v0.0.32-beta2** and above --> https://github.com/Gekkoushi/plugin (No updates, 1.3k sources)
+
+### Support Server
+
+[![Discord][discord-shield]][discord-url]
 
 ![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FGekkoushi%2Fplugin-source%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/Gekkoushi/plugin-source.svg)](https://jitpack.io/#Gekkoushi/plugin-source) [![Build](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/Gekkoushi/plugin-source)
 
@@ -42,3 +45,6 @@ install instructions. See [LICENSE](./LICENSE) for more details.
 **`¯\_(ツ)_/¯`**
 
 This repository has been built by contributors / users, the content inside has been provided by **[Gemini](https://gemini.google.com/)**, but where is it, no one knows. No one knows how it works.
+
+[discord-shield]: https://img.shields.io/discord/1518057632064209017?label=Discord&logo=discord
+[discord-url]: https://discord.gg/CyJeVDP7Cw

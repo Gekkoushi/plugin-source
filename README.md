@@ -3,6 +3,18 @@
 This project provides a collection of utilities and some parsers for convenient access to some contents available on the web. It can be used in
 JVM and Android applications.
 
+> [!IMPORTANT]
+> Only for the Usagi App!
+> For the other forks ignore this.
+>
+> **v0.0.31-beta1** and below use this plugin --> https://github.com/mochi-plugins/repository
+>
+> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/d9db4a9 (Updates yes.)
+>
+> Manual install is required for UMA is required.
+>
+> **v0.0.32-beta2** and above --> https://github.com/Gekkoushi/plugin (No updates, 1.3k sources)
+
 ![Sources count](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2FGekkoushi%2Fplugin-source%2Frefs%2Fheads%2Fmaster%2F.github%2Fsummary.yaml&query=total&label=manga%20sources&color=%23E9321C) [![](https://jitpack.io/v/Gekkoushi/plugin-source.svg)](https://jitpack.io/#Gekkoushi/plugin-source) [![Build](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml/badge.svg?branch=master)](https://github.com/Gekkoushi/plugin-source/actions/workflows/test-branch.yml) ![License](https://img.shields.io/github/license/Gekkoushi/plugin-source)
 
 ### Usage

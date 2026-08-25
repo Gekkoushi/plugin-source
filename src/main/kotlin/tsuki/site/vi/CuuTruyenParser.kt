@@ -161,8 +161,8 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 				publicUrl = "https://$domain/mangas/${jo.getLong("id")}",
 				title = jo.getString("name"),
 				altTitles = emptySet(),
-				coverUrl = if (server == MOBILE_COVER) jo.getString(MOBILE_COVER)
-                    else jo.getString(DESKTOP_COVER),
+				coverUrl = if (server == MOBILE_COVER) jo.getString(MOBILE_COVER).fixStorageHost()
+                    else jo.getString(DESKTOP_COVER).fixStorageHost(),
 				largeCoverUrl = null,
 				authors = setOfNotNull(author),
 				tags = emptySet(),
@@ -232,8 +232,8 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 					source = source,
 				)
 			},
-			largeCoverUrl = if (server == MOBILE_COVER) json.getString(MOBILE_PANORAMA)
-				else json.getString(DESKTOP_PANORAMA),
+			largeCoverUrl = if (server == MOBILE_COVER) json.getString(MOBILE_PANORAMA).fixStorageHost()
+				else json.getString(DESKTOP_PANORAMA).fixStorageHost(),
 		)
 	}
 
@@ -242,9 +242,9 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 		val json = webClient.httpGet(url).parseJson().getJSONObject("data")
 
 		return json.getJSONArray("pages").mapJSON { jo ->
-			val imageUrl = jo.getString("image_url").toHttpUrl().newBuilder()
+			val imageUrl = jo.getString("image_url").fixStorageHost().toHttpUrl().newBuilder()
 			val id = jo.getLong("id")
-			val drm = jo.getStringOrNull("drm_data")
+			val drm = jo.getStringOrNull("drm_data")?.filterNot { it.isWhitespace() }
 			if (!drm.isNullOrEmpty()) {
 				imageUrl.fragment(DRM_DATA_KEY + drm)
 			}
@@ -255,6 +255,29 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 				source = source,
 			)
 		}
+	}
+
+	private fun String.fixStorageHost(): String {
+		var result = this
+		for ((from, to) in STORAGE_HOST_FALLBACK) {
+			result = result.replace(from, to)
+		}
+		return result
+	}
+
+	private fun storageHostInterceptor(chain: Interceptor.Chain): Response {
+		var request = chain.request()
+		STORAGE_HOST_FALLBACK[request.url.host]?.let { host ->
+			request = request.newBuilder()
+				.url(request.url.newBuilder().host(host).build())
+				.build()
+		}
+		if (request.url.encodedPath.startsWith("/api/")) {
+			request = request.newBuilder()
+				.header("Cuutruyen-Client", CLIENT_HEADER)
+				.build()
+		}
+		return chain.proceed(request)
 	}
 
 	override fun intercept(chain: Interceptor.Chain): Response {
@@ -448,9 +471,14 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 	private companion object {
 		const val DRM_DATA_KEY = "drm_data="
 		const val DECRYPTION_KEY = "3141592653589793"
+		const val CLIENT_HEADER = "OfficialWebApp-20250805"
         const val MOBILE_COVER = "cover_mobile_url"
 		const val MOBILE_PANORAMA = "panorama_mobile_url"
         const val DESKTOP_COVER = "cover_url"
         const val DESKTOP_PANORAMA = "panorama_url"
+		val STORAGE_HOST_FALLBACK = mapOf(
+			"storage-ct.lrclib.net" to "storage-bravo.cuutruyen.net",
+			"storage-ct-riften.site" to "storage-charlie.cuutruyen.net",
+		)
 	}
 }

@@ -281,17 +281,17 @@ internal class CuuTruyenParser(context: MangaLoaderContext) :
 	}
 
 	override fun intercept(chain: Interceptor.Chain): Response {
-		val response = chain.proceed(chain.request())
-		val fragment = response.request.url.fragment
-
-		if (fragment == null || !fragment.contains(DRM_DATA_KEY)) {
-			return response
-		}
-
-		return context.redrawImageResponse(response) { bitmap ->
-			val drmData = fragment.substringAfter(DRM_DATA_KEY)
-			unscrambleImage(bitmap, drmData)
-		}
+	    val response = storageHostInterceptor(chain)
+	    val fragment = response.request.url.fragment
+	
+	    if (fragment == null || !fragment.contains(DRM_DATA_KEY)) {
+	        return response
+	    }
+	
+	    return context.redrawImageResponse(response) { bitmap ->
+	        val drmData = fragment.substringAfter(DRM_DATA_KEY)
+	        unscrambleImage(bitmap, drmData)
+	    }
 	}
 
 	private fun unscrambleImage(bitmap: Bitmap, drmData: String): Bitmap {

@@ -8,7 +8,7 @@ JVM and Android applications.
 >
 > **v0.0.31-beta1** and below use this plugin --> https://github.com/mochi-plugins/repository
 >
-> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/ea0f1d0 (Updates yes.)
+> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/f9c11fd (Updates yes.)
 >
 > Manual install is required for UMA is required.
 >

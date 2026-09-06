@@ -6,13 +6,9 @@ JVM and Android applications.
 > [!IMPORTANT]
 > Only for the Usagi App!
 >
-> **v0.0.31-beta1** and below use this plugin --> https://github.com/mochi-plugins/repository
->
-> **v0.0.32-beta2** and above --> https://github.com/InvalidDavid/UMA/releases/tag/f9c11fd (Updates yes.)
->
-> Manual install is required for UMA is required.
->
-> **v0.0.32-beta2** and above --> https://github.com/Gekkoushi/plugin (No updates, 1.3k sources)
+> --> https://github.com/InvalidDavid/UMA/releases/tag/067e303 Automatic or Manual works 
+> **Only for the 1.0version**
+> --> https://github.com/Gekkoushi/plugin (No updates, 1.3k sources)
 
 ### Support Server
 

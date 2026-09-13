@@ -6,7 +6,7 @@ JVM and Android applications.
 > [!IMPORTANT]
 > Only for the Usagi App!
 >
-> --> https://github.com/InvalidDavid/UMA/releases/tag/067e303 Automatic or Manual works 
+> --> https://github.com/InvalidDavid/UMA Automatic or Manual works 
 > **Only for the 1.0version**
 >
 > --> https://github.com/Gekkoushi/plugin (No updates, 1.3k sources)

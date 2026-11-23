@@ -6,7 +6,7 @@ coroutines = "1.10.2"
 junit = "5.14.3"
 okhttp = "5.3.2"
 okio = "3.17.0"
-json = "20251224"
+json = "20260719"
 # Keep Android 5, 6 compatible (with SDK 21 - 23)
 #noinspection NewerVersionAvailable
 jsoup = "1.17.2"
